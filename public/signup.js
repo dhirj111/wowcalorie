@@ -8,7 +8,7 @@ const handleformsubmit = (event) => {
   };
   // console.log(userDetails)
   axios
-    .post("https://localhost:5000/signup", userDetails)
+    .post("http://localhost:1000/postsignup", userDetails)
     .then((response) => {
       document.getElementById('note').textContent = "message for user == "
       document.getElementById('note').textContent += response.data.message;
