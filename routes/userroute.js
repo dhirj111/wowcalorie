@@ -40,8 +40,20 @@ router.get('/getrecipes', userController.getAllRecipes);
 
 router.get('/searchrecipes', userController.searchRecipes);
 
-router.get('/:id', userController.getProfile)
+router.get('/profile:id', userController.getProfile)
 
 router.get('/userrecipies/:id', userController.userrecipies)
+
+router.post("/followuser", auth, userController.followUser);
+
+router.get("/following", userController.servefollowingpage);
+
+router.get("/favourite", userController.servefavouritepage);
+
+router.get('/followingreciepies', auth, userController.followingreciepies)
+
+router.post("/favourited" ,auth ,userController.favourited)
+
+router.get('/getstarreddish',auth,userController.getstarreddish)
 
 module.exports = router

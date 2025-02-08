@@ -4,6 +4,8 @@ const validator = require('validator');
 require('dotenv').config();
 const bcrypt = require('bcrypt')
 const Wowuser = require('../models/wowuser');
+const Follow = require('../models/follows');
+const Starred = require('../models/starred')
 const Dish = require('../models/dishes');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
@@ -305,7 +307,7 @@ exports.userrecipies = async (req, res) => {
       where: {
         userId: profileId, // Filter by creatorId
       },
-      attributes: { exclude: ["creatorName", "userId"] }, // Exclude 'name' and 'creatorId'
+      // Exclude 'name' and 'creatorId'
       include: [
         {
           model: Wowuser,
@@ -319,5 +321,199 @@ exports.userrecipies = async (req, res) => {
   } catch (error) {
     console.error("Error fetching user recipes:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+exports.followUser = async (req, res) => {
+  try {
+    // Get follower ID from authenticated user (req.user)
+    const followerId = req.user.id;
+    // Get the target user (profile) ID from the request body
+    const followedId = req.body.userId;
+
+    // Optional: check if the user is already following the target profile
+    const existingFollow = await Follow.findOne({ where: { followerId, followedId } });
+    if (existingFollow) {
+      return res.status(400).json({ message: "Already following this user." });
+    }
+
+    // Create a new follow record
+    const newFollow = await Follow.create({ followerId, followedId });
+
+    res.status(201).json({ message: "Followed successfully", follow: newFollow });
+  } catch (error) {
+    console.error("Error in followUser:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+exports.servefollowingpage = async (req, res) => {
+
+  res.sendFile(path.join(__dirname, '..', 'public', 'following.html'));
+}
+
+exports.followingreciepies = async (req, res) => {
+  try {
+    // Find all users that the current user follows
+    const followedUsers = await Follow.findAll({
+      where: {
+        followerId: req.user.id
+      },
+      attributes: ['followedId']
+    });
+
+    // Extract the followed user IDs
+    const followedUserIds = followedUsers.map(follow => follow.followedId);
+
+    // If user follows no one, return empty array
+    if (followedUserIds.length === 0) {
+      return res.json([]);
+    }
+
+    // Find all dishes from followed users with their creator information
+    const dishes = await Dish.findAll({
+      where: {
+        userId: {
+          [Op.in]: followedUserIds
+        }
+      },
+      include: [{
+        model: Wowuser,
+        attributes: ['id', 'name', 'email'],
+        required: true
+      }],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Format the response to match your frontend display function
+    const formattedDishes = dishes.map(dish => {
+      const plainDish = dish.get({ plain: true });
+      return {
+        id: plainDish.id,
+        name: plainDish.name,
+        imageUrl: plainDish.imageUrl,
+        diet: plainDish.diet,
+        difficulty: plainDish.difficulty,
+        time: plainDish.time,
+        steps: plainDish.steps,
+        glutenfree: plainDish.glutenfree,
+        ingredients: plainDish.ingredients,
+        creatorName: plainDish.wowuser ? plainDish.wowuser.name : plainDish.creatorName
+      };
+    });
+
+    res.json(formattedDishes);
+
+  } catch (error) {
+    console.error('Error fetching following dishes:', error);
+    res.status(500).json({
+      error: "Error fetching dishes",
+      details: error.message
+    });
+  }
+}
+
+exports.favourited = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { dishId } = req.body;
+
+    if (!dishId) {
+      return res.status(400).json({ error: "Dish ID is required" });
+    }
+
+    // Check if the dish is already starred by the user
+    const existingEntry = await Starred.findOne({ where: { userId, dishId } });
+
+    if (existingEntry) {
+      return res.status(409).json({ message: "Dish already starred" });
+    }
+
+    // Add the dish to favorites
+    await Starred.create({ userId, dishId });
+
+    res.status(201).json({ message: "Dish starred successfully" });
+  } catch (error) {
+    console.error("Error starring dish:", error);
+    res.status(500).json({ error: "Failed to star dish" });
+  }
+};
+
+exports.servefavouritepage = async (req, res) => {
+
+  res.sendFile(path.join(__dirname, '..', 'public', 'favourite.html'));
+}
+
+
+
+exports.getstarreddish = async (req, res) => {
+  try {
+
+    const userId = req.user.id
+
+    // Find all starred entries for the current user
+    const starredEntries = await Starred.findAll({
+      where: {
+        userId: userId
+      },
+      attributes: ['dishId']
+    });
+
+    // Extract dish IDs from starred entries
+    const starredDishIds = starredEntries.map(entry => entry.dishId);
+
+    // If no starred dishes, return empty array
+    if (starredDishIds.length === 0) {
+      return res.json([]);
+    }
+
+    // Fetch all starred dishes with their creator information
+    const starredDishes = await Dish.findAll({
+      where: {
+        id: starredDishIds
+      },
+      include: [{
+        model: Wowuser,
+        attributes: ['id', 'name'],
+        required: false // Use false to still get dishes even if user is deleted
+      }],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Format dishes to match frontend display requirements
+    const formattedDishes = starredDishes.map(dish => {
+      const plainDish = dish.get({ plain: true });
+      return {
+        id: plainDish.id,
+        name: plainDish.name,
+        imageUrl: plainDish.imageUrl || '',
+        diet: plainDish.diet || 'Not specified',
+        difficulty: plainDish.difficulty || 'Not specified',
+        time: plainDish.time || 0,
+        steps: plainDish.steps || 'No steps provided',
+        glutenfree: plainDish.glutenfree,
+        ingredients: plainDish.ingredients,
+        userId: plainDish.userId, // For the profile link
+        creatorName: plainDish.creatorName || (plainDish.wowuser ? plainDish.wowuser.name : 'Anonymous')
+      };
+    });
+
+    res.json(formattedDishes);
+
+  } catch (error) {
+    console.error('Error fetching starred dishes:', error);
+    
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ 
+        error: "Invalid token",
+        details: "Please login again"
+      });
+    }
+
+    res.status(500).json({ 
+      error: "Error fetching starred dishes",
+      details: error.message 
+    });
   }
 };

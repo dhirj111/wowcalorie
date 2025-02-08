@@ -1,21 +1,12 @@
-const urlParams = new URLSearchParams(window.location.search);
-const profileId = urlParams.get("id");
-console.log("Profile ID:", profileId);
-
-document.getElementById("profile-name-display").textContent = "Loading...";
-
 function displayRecipes(recipes) {
   const container = document.getElementById("recipeContainer");
   container.innerHTML = "";
 
   if (recipes.length === 0) {
-    container.innerHTML = "<p>No recipes found for this user.</p>";
+    container.innerHTML = "<p>No recipes found</p>";
     return;
   }
 
-  const profileName = recipes[0]?.Wowuser?.name || "Unknown";
-  document.getElementById("profile-name").textContent = profileName;
-  document.getElementById("profile-name-display").textContent = profileName;
 
   recipes.forEach((recipe) => {
     console.log(recipe);
@@ -32,16 +23,31 @@ function displayRecipes(recipes) {
           <p>Difficulty: ${recipe.difficulty}</p>
           <p>Time: ${recipe.time} minutes</p>
           <p>Steps: ${recipe.steps || "No steps provided"}</p>
+          <button onclick="favouriteDish(${recipe.id})" style="background-color: gold; color: black; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">
+            ⭐ Star
+        </button>
         </div>
       </div>
     `;
     container.innerHTML += card;
   });
 }
-
+function favouriteDish(dishId) {
+  axios.post("http://localhost:1000/favourited", { dishId }, {
+    headers: {
+      token: localStorage.getItem("user jwt")
+    }
+  })
+    .then(response => alert("Dish added to favourites!"))
+    .catch(error => console.error("Error adding to favourites:", error));
+}
 // Fetch user's recipes
 axios
-  .get(`/userrecipies/${profileId}`)
+  .get('http://localhost:1000/followingreciepies', {
+    headers: {
+      token: localStorage.getItem("user jwt")
+    }
+  })
   .then((result) => {
     console.log(result);
     displayRecipes(result.data);
@@ -49,22 +55,3 @@ axios
   .catch((err) => {
     console.error("Error fetching recipes:", err);
   });
-
-// Follow user functionality
-document.getElementById("follow-btn").addEventListener("click", () => {
-  axios
-    .post("http://localhost:1000/followuser", {
-      userId: profileId,
-    }, {
-      headers: {
-        token: localStorage.getItem("user jwt")
-      }
-    })
-    .then(() => {
-      alert("Followed successfully!");
-    })
-    .catch((err) => {
-      console.error("Error following user:", err);
-      alert("Error following user.");
-    });
-});

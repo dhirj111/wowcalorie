@@ -124,13 +124,24 @@ function displayRecipes(recipes) {
 
                   <input type="text" id="comment-${recipe.id}" placeholder="Leave a comment">
                   <button onclick="submitComment(${recipe.id})">Comment</button>
+                  <button onclick="favouriteDish(${recipe.id})" style="background-color: gold; color: black; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">
+            ⭐ Star
+        </button>
               </div>
           </div>
       `;
     container.innerHTML += card;
   });
 }
-
+function favouriteDish(dishId) {
+  axios.post("http://localhost:1000/favourited", { dishId }, {
+    headers: {
+      token: localStorage.getItem("user jwt")
+    }
+  })
+    .then(response => alert("Dish added to favourites!"))
+    .catch(error => console.error("Error adding to favourites:", error));
+}
 
 // Load initial recipes when the page loads
 document.addEventListener('DOMContentLoaded', () => {
@@ -143,3 +154,11 @@ document.getElementById('searchInput').addEventListener('keypress', (e) => {
     searchRecipes();
   }
 });
+
+const followingTab = (event) => {
+  event.preventDefault();
+  // Navigate to the /following route
+  window.location.href = "http://localhost:1000/following";
+}
+
+
