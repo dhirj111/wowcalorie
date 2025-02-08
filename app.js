@@ -1,12 +1,13 @@
 const express = require('express');
-const path = require('path');
 const cors = require('cors');
-const fs = require('fs')
-const https = require('https')
-// const { v4: uuidv4 } = require('uuid');
-// uuidv4();
 const app = express();
-
+const path = require('path')
+// Middleware order is important
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static('uploads'));
 // Middleware in the correct order
 app.use(cors());
 app.use(express.json()); // Built-in middleware for parsing JSON

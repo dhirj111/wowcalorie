@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Form</title>
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #333;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #ff4444;
+    }
+
+    label {
+      display: block;
+      margin: 1rem 0 0.3rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 0.5rem;
+      background: #444;
+      border: 1px solid #666;
+      color: white;
+      border-radius: 4px;
+    }
+
+    .diet-group {
+      display: flex;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .diet-group label {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button {
+      background: #ff4444;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background: #cc0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Recipe Form</h2>
+    
+    <label>Name of Dish</label>
+    <input type="text" placeholder="Enter dish name">
+
+    <div class="diet-group">
+      <label>
+        <input type="radio" name="diet" value="veg"> Vegetarian
+      </label>
+      <label>
+        <input type="radio" name="diet" value="nonveg"> Non-Vegetarian
+      </label>
+      <label>
+        <input type="checkbox"> Gluten-Free
+      </label>
+    </div>
+
+    <label>Difficulty Level</label>
+    <select>
+      <option value="easy">Easy</option>
+      <option value="mid">Mid</option>
+      <option value="hard">Hard</option>
+    </select>
+
+    <label>Preparation Time (minutes)</label>
+    <input type="number" placeholder="Enter time">
+
+    <label>Ingredients</label>
+    <textarea placeholder="List ingredients (comma-separated)" rows="3"></textarea>
+
+    <label>Picture of Dish</label>
+    <input type="file">
+
+    <label>Preparation Steps</label>
+    <textarea placeholder="Describe preparation steps" rows="5"></textarea>
+
+    <button onclick="submitForm()">Submit Recipe</button>
+  </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
+<script src="newdish.js"></script>
+</html>
