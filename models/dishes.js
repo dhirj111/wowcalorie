@@ -12,6 +12,14 @@ const Dish = sequelize.define('dish', {
     type: Sequelize.STRING(45),  // Matches table definition
     allowNull: true  // Since `expense` is defined as NULL in table
   },
+  userId: {  // Add this field for the association
+    type: Sequelize.INTEGER,
+    allowNull: false
+  },
+  creatorName:{
+    type: Sequelize.STRING(45),  // Matches table definition
+    allowNull: true  // Since `expense` is defined as NULL in table
+  },
   diet: {
     type: Sequelize.STRING(45),  // Matches table definition
     allowNull: true  // Since `expense` is defined as NULL in table

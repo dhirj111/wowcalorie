@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Details</title>
+</head>
+<style>
+  body {
+    background-color: #1a1a1a;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+
+  .header {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .filters {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+  }
+
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .recipe-card {
+    background-color: #333;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .recipe-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .recipe-content {
+    padding: 15px;
+  }
+
+  .recipe-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  input,
+  select,
+  button {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #666;
+    background-color: #444;
+    color: white;
+  }
+
+  button {
+    background-color: #ff4444;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #cc0000;
+  }
+
+  .profile-icon {
+    width: 30px;
+    height: 30px;
+    background-color: #ff4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rating-section,
+  .comment-section {
+    margin-top: 10px;
+  }
+
+  .comment-section input {
+    width: calc(100% - 100px);
+  }
+</style>
+
+<body>
+  <h1 id="profile-title">Profile Details</h1>
+  <p>Profile ID: <span id="profile-id"></span></p>
+  <div class="recipe-grid" id="recipeContainer">
+    <!-- Recipes will be loaded here -->
+  </div>
+
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
+<script src="profile.js"></script>
+
+</html>

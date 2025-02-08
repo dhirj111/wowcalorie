@@ -14,6 +14,12 @@ app.use(express.json()); // Built-in middleware for parsing JSON
 // app.use(express.urlencoded({ extended: true })); // Built-in middleware for parsing URL-encoded data
 const sequelize = require('./util/database');
 const userroute = require('./routes/userroute');
+const Wowuser = require('./models/wowuser');
+const Dish = require('./models/dishes');
+
+// Define associations
+Dish.belongsTo(Wowuser, { foreignKey: 'userId' });
+Wowuser.hasMany(Dish, { foreignKey: 'userId' });
 // const demomodel = require('./models/demomodel');
 app.use(userroute);
 // Static file serving

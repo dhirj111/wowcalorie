@@ -1,5 +1,5 @@
 const path = require('path');
-
+const { Op } = require('sequelize');
 const express = require('express');
 const auth = require('../middleware/auth');
 const userController = require('../controllers/wowcontrol');
@@ -35,5 +35,13 @@ router.get('/newdish', userController.newdishpage)
 router.post('/dishpost', auth, upload.single('image'), userController.dishpostdb);
 
 router.get('/', userController.baseport)
+
+router.get('/getrecipes', userController.getAllRecipes);
+
+router.get('/searchrecipes', userController.searchRecipes);
+
+router.get('/:id', userController.getProfile)
+
+router.get('/userrecipies/:id', userController.userrecipies)
 
 module.exports = router

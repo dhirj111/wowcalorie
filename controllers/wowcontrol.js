@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
 // Configure storage
-
+const { Op } = require('sequelize');
 const cloudinary = require('cloudinary').v2;
 
 // Configure Cloudinary
@@ -199,14 +199,16 @@ exports.dishpostdb = async (req, res) => {
 
     // Create new dish in database
     const newDish = await Dish.create({
-      name: name,
-      diet: diet,
-      glutenfree: glutenFree === 'true', // Convert string to boolean
-      difficulty: difficulty,
-      time: parseInt(preparationTime), // Convert string to number
-      ingredients: ingredients,
-      steps: steps,
-      imageUrl: imageUrl
+      name,
+      diet,
+      glutenfree: glutenFree === 'true',
+      difficulty,
+      time: parseInt(preparationTime),
+      ingredients,
+      steps,
+      imageUrl,
+      userId: req.user.id, // Add this line
+      creatorName: req.user.name
     });
 
     res.status(201).json({
@@ -224,12 +226,98 @@ exports.dishpostdb = async (req, res) => {
     });
 
     // If file exists but database operation failed, clean up the uploaded file
-    if (req.file && req.file.path) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (unlinkError) {
-        console.error("Error deleting file:", unlinkError);
-      }
-    }
+
+
+  }
+};
+exports.getAllRecipes = async (req, res) => {
+  try {
+    const filters = {
+      diet: req.query.diet,
+      difficulty: req.query.difficulty,
+      glutenfree: req.query.glutenfree === 'true',
+      maxTime: req.query.maxTime
+    };
+
+    let whereClause = {};
+
+    if (filters.diet) whereClause.diet = filters.diet;
+    if (filters.difficulty) whereClause.difficulty = filters.difficulty;
+    if (filters.glutenfree) whereClause.glutenfree = filters.glutenfree;
+    if (filters.maxTime) whereClause.time = { [Op.lte]: parseInt(filters.maxTime) };
+
+    const recipes = await Dish.findAll({
+      where: whereClause,
+      include: [{
+        model: Wowuser,
+        attributes: ['id', 'name']  // Fetching both user ID and name
+      }],
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.status(200).json(recipes);
+  } catch (error) {
+    console.error('Error fetching recipes:', error);
+    res.status(500).json({ error: 'Failed to fetch recipes' });
+  }
+};
+
+exports.searchRecipes = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    const recipes = await Dish.findAll({
+      where: {
+        [Op.or]: [
+          { name: { [Op.like]: `%${query}%` } },
+          { ingredients: { [Op.like]: `%${query}%` } }
+        ]
+      },
+      include: [{
+        model: Wowuser,
+        attributes: ['id', 'name']  // Fetching both user ID and name
+      }],
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.status(200).json(recipes);
+  } catch (error) {
+    console.error('Error searching recipes:', error);
+    res.status(500).json({ error: 'Failed to search recipes' });
+  }
+};
+
+
+exports.getProfile = async (req, res) => {
+  const profileId = req.params.id;
+
+  // Redirect to a static HTML page with the ID in the URL
+  res.redirect(`/profile.html?id=${profileId}`);
+  console.log("hitting personal profiles")
+}
+
+
+exports.userrecipies = async (req, res) => {
+  try {
+    const profileId = req.params.id;
+
+    const recipes = await Dish.findAll({
+      where: {
+        userId: profileId, // Filter by creatorId
+      },
+      attributes: { exclude: ["creatorName", "userId"] }, // Exclude 'name' and 'creatorId'
+      include: [
+        {
+          model: Wowuser,
+          attributes: ["id", "name"], // Include user ID and name from Wowuser
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json(recipes);
+  } catch (error) {
+    console.error("Error fetching user recipes:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
