@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const express = require('express');
 const auth = require('../middleware/auth');
 const userController = require('../controllers/wowcontrol');
+const adminController = require('../controllers/admincontroller')
 const router = express.Router();
 const multer = require('multer');
 
@@ -54,6 +55,9 @@ router.get('/followingreciepies', auth, userController.followingreciepies)
 
 router.post("/favourited" ,auth ,userController.favourited)
 
+router.get('/admin', adminController.loginpage)
+
 router.get('/getstarreddish',auth,userController.getstarreddish)
 
+router.post('/adminpostlogin' ,adminController.adminpostlogin)
 module.exports = router
