@@ -445,6 +445,11 @@ exports.servefavouritepage = async (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'favourite.html'));
 }
 
+exports.servemyprofile = async (req, res) => [
+
+  res.sendFile(path.join(__dirname, '..', 'public', 'myprofile.html'))
+]
+
 
 
 exports.getstarreddish = async (req, res) => {
@@ -503,17 +508,50 @@ exports.getstarreddish = async (req, res) => {
 
   } catch (error) {
     console.error('Error fetching starred dishes:', error);
-    
+
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: "Invalid token",
         details: "Please login again"
       });
     }
 
-    res.status(500).json({ 
+    res.status(500).json({
       error: "Error fetching starred dishes",
-      details: error.message 
+      details: error.message
     });
+  }
+};
+
+exports.owndishes = async (req, res) => {
+  try {
+    const profileId = req.user.id;
+
+    const recipes = await Dish.findAll({
+      where: {
+        userId: profileId, // Filter by creatorId
+      }
+    })
+    res.json(recipes)
+  }
+  catch (err) {
+    console.log(err)
+
+  }
+
+}
+
+exports.owndishdelete = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { dishid } = req.params;
+    const deleted = await Dish.destroy({ where: { id: dishid, userId: userId } });
+
+    if (deleted) {
+      return res.status(200).json({ message: "Dish deleted successfully" });
+    }
+    res.status(404).json({ error: "Dish not found" });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
   }
 };

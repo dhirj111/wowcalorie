@@ -41,7 +41,7 @@ router.get('/getrecipes', userController.getAllRecipes);
 
 router.get('/searchrecipes', userController.searchRecipes);
 
-router.get('/profile:id', userController.getProfile)
+router.get('/profile/:id', userController.getProfile)
 
 router.get('/userrecipies/:id', userController.userrecipies)
 
@@ -49,15 +49,28 @@ router.post("/followuser", auth, userController.followUser);
 
 router.get("/following", userController.servefollowingpage);
 
+router.get("/myprofile", userController.servemyprofile);
+
+router.get("/owndishes", auth, userController.owndishes)
+
 router.get("/favourite", userController.servefavouritepage);
 
 router.get('/followingreciepies', auth, userController.followingreciepies)
 
-router.post("/favourited" ,auth ,userController.favourited)
+router.post("/favourited", auth, userController.favourited)
 
-router.get('/admin', adminController.loginpage)
+router.get('/admin', adminController.serveadminlogin)
 
-router.get('/getstarreddish',auth,userController.getstarreddish)
+router.get('/getstarreddish', auth, userController.getstarreddish)
 
-router.post('/adminpostlogin' ,adminController.adminpostlogin)
+router.post('/adminpostlogin', adminController.adminpostlogin)
+
+router.get('/manageadmin', adminController.frontmanage)
+
+router.get('/alldishes', adminController.getalldishes)
+
+router.get('/allusers', adminController.allusers)
+
+router.delete("/owndishes/:dishid", auth, userController.owndishdelete);
+
 module.exports = router

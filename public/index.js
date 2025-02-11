@@ -108,7 +108,7 @@ function displayRecipes(recipes) {
                       <div class="profile-icon">👤</div>
                       <h3>${recipe.name}</h3>
                   </div>
-                  <p>By: <a href="http://localhost:1000/${userId}" target="_blank">${userName}</a></p>
+                  <p>By: <a href="http://localhost:1000/profile/${userId}" target="_blank">${userName}</a></p>
                   <p>Diet: ${recipe.diet}</p>
                   <p>Difficulty: ${recipe.difficulty}</p>
                   <p>Time: ${recipe.time} minutes</p>
