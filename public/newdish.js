@@ -1,3 +1,7 @@
+if(localStorage.getItem("user jwt")==null){
+
+    window.alert("login or signup to post dishes")
+}
 function submitForm() {
     console.log("button clicked 100")
     const formData = new FormData();
@@ -24,6 +28,9 @@ function submitForm() {
         }
     })
         .then(response => {
+            if(!(response.success)){
+                alert("you are not logged in currently ,please login")
+            }
             alert("Recipe submitted successfully!");
         })
         .catch(error => {

@@ -73,4 +73,8 @@ router.get('/allusers', adminController.allusers)
 
 router.delete("/owndishes/:dishid", auth, userController.owndishdelete);
 
+router.post("/commentRecipe",auth ,userController.commentpost)
+
+router.get("/getcomments", userController.getComments);
+
 module.exports = router

@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt')
 const Wowuser = require('../models/wowuser');
 const Follow = require('../models/follows');
 const Starred = require('../models/starred')
+const Comment = require('../models/comments')
 const Dish = require('../models/dishes');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
@@ -553,5 +554,39 @@ exports.owndishdelete = async (req, res) => {
     res.status(404).json({ error: "Dish not found" });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.commentpost = async (req, res) => {
+
+  console.log(req.user.name, req.body.dishId, req.body.comment)
+  try {
+
+    const newComment = await Comment.create({
+      name: req.user.name,
+      dishId: req.body.dishId,
+      comment: req.body.comment
+    });
+res.json(newComment)
+
+  }
+  catch (err) {
+    console.log(err)
+  }
+}
+
+exports.getComments = async (req, res) => {
+  const dishId = req.query.dishId;
+  console.log("Fetching comments for dish:", dishId);
+
+  try {
+    // Use findAll with a "where" clause to fetch comments matching the dishId.
+    const comments = await Comment.findAll({
+      where: { dishId }
+    });
+    res.json(comments);
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res.status(500).json({ error: "Error fetching comments" });
   }
 };

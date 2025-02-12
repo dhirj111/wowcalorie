@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -125,9 +124,23 @@
     .comment-section input {
       width: calc(100% - 100px);
     }
+
+    /* New CSS for comments */
+    .comments-container {
+      background-color: #222;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    .comment-card {
+      background-color: #444;
+      padding: 5px;
+      margin-bottom: 5px;
+      border-radius: 4px;
+    }
   </style>
 </head>
-
 <body>
   <!-- Navigation Bar -->
   <nav class="navbar">
@@ -137,9 +150,6 @@
     <a id="profileTab" href="http://localhost:1000/myprofile">Profile</a>
     <a id="newdish" onclick="newdishbutton(event)">Add New Dish</a>
   </nav>
-
-  <!-- Optional: Existing new dish button (if required by your current logic) -->
-  <!-- <button id="newdish" onclick="newdishbutton(event)">SUBMIT NEW DISH</button> -->
 
   <div class="header">
     <div class="search-container">
@@ -170,8 +180,8 @@
     <!-- Recipes will be loaded here -->
   </div>
 
+  <!-- Include Axios and our JS file -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
   <script src="index.js"></script>
 </body>
-
 </html>

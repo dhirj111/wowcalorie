@@ -1,3 +1,8 @@
+if(localStorage.getItem("user jwt")==null){
+  console.log
+  alert("you are not logged in");
+  window.location.href = "http://localhost:1000/login"
+}
 function displayRecipes(recipes) {
   const container = document.getElementById("recipeContainer");
   container.innerHTML = "";
@@ -49,9 +54,11 @@ axios
     }
   })
   .then((result) => {
+    console.log("result is ---",result)
     console.log(result);
     displayRecipes(result.data);
   })
   .catch((err) => {
+    alert("you are not logged in currently ,please login")
     console.error("Error fetching recipes:", err);
   });
