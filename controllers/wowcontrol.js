@@ -645,9 +645,7 @@ exports.allfollowings = async (req, res) => {
 };
 
 exports.servecollectionspage = async (req, res) => {
-
   res.sendFile(path.join(__dirname, '..', 'public', 'collections.html'));
-
 }
 
 exports.postnewcollection = async (req, res) => {
@@ -669,10 +667,40 @@ exports.getcollections = async (req, res) => {
 }
 
 exports.collectiondishadd =async (req,res)=>{
-
   await Collectiondish.create({
     collectionId:req.body.collectionId,
     dishId:req.body.dishId
   })
   res.json({condtion:true})
 }
+
+exports.dishbycolection = async (req, res) => {
+  try {
+      // Get collectionId from query params
+      const collectionId = req.query.collectionId;
+      
+      // First, get all dishIds for this collection from CollectionDish table
+      const collectionDishes = await Collectiondish.findAll({
+          where: {
+              collectionId: collectionId
+          },
+          attributes: ['dishId']
+      });
+
+      // Extract just the dishIds into an array
+      const dishIds = collectionDishes.map(item => item.dishId);
+
+      // Now fetch all dishes from Dish table that match these ids
+      const dishes = await Dish.findAll({
+          where: {
+              id: dishIds
+          }
+      });
+
+      res.status(200).json(dishes);
+
+  } catch (error) {
+      console.error('Error fetching collection dishes:', error);
+      res.status(500).json({ error: 'Failed to fetch collection dishes' });
+  }
+};

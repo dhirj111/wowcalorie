@@ -89,4 +89,6 @@ router.get('/getcollections' ,auth ,userController.getcollections)
 
 router.post('/collectiondishadd',auth ,userController.collectiondishadd)
 
+router.get('/getcollectiondishes', auth, userController.dishbycolection);
+
 module.exports = router
