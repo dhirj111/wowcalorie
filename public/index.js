@@ -55,6 +55,51 @@ function applyFilters() {
   loadRecipes(filters);
 }
 
+// Function to load user collections
+function loadUserCollections(selectElement) {
+  axios.get("http://localhost:1000/getcollections", {
+    headers: {
+      token: localStorage.getItem("user jwt")
+    }
+  })
+    .then(response => {
+      selectElement.innerHTML = '<option value="">Select Collection</option>';
+      console.log(response.data)
+      response.data.forEach(collection => {
+        selectElement.innerHTML += `
+          <option value="${collection.id}">${collection.collectionName}</option>
+        `;
+      });
+    })
+    .catch(error => {
+      console.error('Error loading collections:', error);
+    });
+}
+
+// Function to add dish to collection
+function addToCollection(collectionId, dishId) {
+  if (!collectionId) {
+    alert("Please select a collection");
+    return;
+  }
+  console.log(collectionId ,"         ",dishId)
+  axios.post("http://localhost:1000/collectiondishadd", {
+    collectionId,
+    dishId
+  }, {
+    headers: {
+      token: localStorage.getItem("user jwt")
+    }
+  })
+    .then(response => {
+      alert("Recipe added to collection successfully!");
+    })
+    .catch(error => {
+      console.error('Error adding to collection:', error);
+      alert('Error adding to collection');
+    });
+}
+
 // Function to load and display comments for a given dish
 function loadComments(dishId, container) {
   axios.get(`http://localhost:1000/getcomments?dishId=${dishId}`)
@@ -120,6 +165,16 @@ function displayRecipes(recipes) {
           <button onclick="favouriteDish(${recipe.id})" style="background-color: gold; color: black; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">
             ⭐ Star
           </button>
+
+          <div class="collection-section" style="margin-top: 10px;">
+            <select id="collection-select-${recipe.id}" style="padding: 5px; margin-right: 5px;">
+              <option value="">Select Collection</option>
+            </select>
+            <button onclick="addToCollection(document.getElementById('collection-select-${recipe.id}').value, ${recipe.id})" 
+                    style="background-color: #4CAF50; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">
+              Add to Collection
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -129,6 +184,9 @@ function displayRecipes(recipes) {
     // Load comments for this dish after its card has been added to the DOM.
     const commentsContainer = document.getElementById(`comments-${recipe.id}`);
     loadComments(recipe.id, commentsContainer);
+
+    // Load collections for this recipe's dropdown
+    loadUserCollections(document.getElementById(`collection-select-${recipe.id}`));
   });
 }
 
@@ -196,5 +254,3 @@ function favouriteDish(dishId) {
 document.addEventListener('DOMContentLoaded', () => {
   loadRecipes();
 });
-
-// Enable searching by pressing the Enter 

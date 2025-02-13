@@ -1,4 +1,4 @@
-if(localStorage.getItem("user jwt")==null){
+if (localStorage.getItem("user jwt") == null) {
   console.log
   alert("you are not logged in");
   window.location.href = "http://localhost:1000/login"
@@ -54,9 +54,31 @@ axios
     }
   })
   .then((result) => {
-    console.log("result is ---",result)
+    console.log("result is ---", result)
     console.log(result);
     displayRecipes(result.data);
+  })
+  .catch((err) => {
+    alert("you are not logged in currently ,please login")
+    console.error("Error fetching recipes:", err);
+  });
+
+
+axios
+  .get('http://localhost:1000/allfollowers', {
+    headers: {
+      token: localStorage.getItem("user jwt")
+    }
+  })
+  .then((result) => {
+
+    console.log(result);
+    let fwgcontainer = document.getElementById("followlist")
+    for (let i = 0; i < result.data.length; i++) {
+      let node = document.createElement('li')
+      node.innerHTML = `${i + 1} |  ${result.data[i].name} id =${result.data[i].id}`
+      fwgcontainer.appendChild(node)
+    }
   })
   .catch((err) => {
     alert("you are not logged in currently ,please login")

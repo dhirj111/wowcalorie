@@ -77,4 +77,16 @@ router.post("/commentRecipe",auth ,userController.commentpost)
 
 router.get("/getcomments", userController.getComments);
 
+router.get('/allfollowers', auth , userController.allfollowers)
+
+router.get('/allfollowings' ,auth ,userController.allfollowings)
+
+router.get('/collections' ,userController.servecollectionspage)
+
+router.post('/newcollection' , auth ,userController.postnewcollection)
+
+router.get('/getcollections' ,auth ,userController.getcollections)
+
+router.post('/collectiondishadd',auth ,userController.collectiondishadd)
+
 module.exports = router

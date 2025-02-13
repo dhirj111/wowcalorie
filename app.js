@@ -1,7 +1,8 @@
 const express = require('express');
-const cors = require('cors');
+
 const app = express();
 const path = require('path')
+const cors =require('cors')
 // Middleware order is important
 app.use(cors());
 app.use(express.json());
@@ -9,9 +10,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static('uploads'));
 // Middleware in the correct order
-app.use(cors());
-app.use(express.json()); // Built-in middleware for parsing JSON
-// app.use(express.urlencoded({ extended: true })); // Built-in middleware for parsing URL-encoded data
 const sequelize = require('./util/database');
 const userroute = require('./routes/userroute');
 const Wowuser = require('./models/wowuser');
@@ -37,4 +35,16 @@ sequelize
   })
   .catch(err => {
     console.error('Database connection error:', err);
-  });
+  })
+// async function sg(){
+//   try {
+//     await sequelize.sync()
+//     app.listen(1000, () => {
+//       console.log("Fgdfgdgf")
+//     })
+//   }
+//   catch (err) {
+//     console.log("err", err)
+//   }
+// }
+// sg()

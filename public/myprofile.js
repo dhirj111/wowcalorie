@@ -75,3 +75,25 @@ document.getElementById('logout').addEventListener('click', () => {
   localStorage.removeItem('user jwt');
   window.location.href = '/login.html';
 });
+
+
+axios
+  .get('http://localhost:1000/allfollowings', {
+    headers: {
+      token: localStorage.getItem("user jwt")
+    }
+  })
+  .then((result) => {
+
+    console.log(result);
+    let fwgcontainer = document.getElementById("followlist")
+    for (let i = 0; i < result.data.length; i++) {
+      let node = document.createElement('li')
+      node.innerHTML = `${i + 1} |  ${result.data[i].name} id =${result.data[i].id}`
+      fwgcontainer.appendChild(node)
+    }
+  })
+  .catch((err) => {
+    alert("you are not logged in currently ,please login")
+    console.error("Error fetching recipes:", err);
+  });

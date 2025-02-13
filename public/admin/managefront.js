@@ -1,4 +1,4 @@
-const { head } = require("../../routes/userroute");
+// const { head } = require("../../routes/userroute");
 
 // Load both dishes and users when the page loads
 document.addEventListener('DOMContentLoaded', () => {

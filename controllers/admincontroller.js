@@ -103,8 +103,5 @@ exports.allusers = async (req, res) => {
   catch (err) {
     console.log(err)
   }
-
-
-
 }
 

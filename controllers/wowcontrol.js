@@ -7,12 +7,15 @@ const Wowuser = require('../models/wowuser');
 const Follow = require('../models/follows');
 const Starred = require('../models/starred')
 const Comment = require('../models/comments')
+const Collections = require('../models/collections')
+const collectiondish = require('../models/collectiondish')
 const Dish = require('../models/dishes');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
 // Configure storage
 const { Op } = require('sequelize');
+const Collectiondish = require('../models/collectiondish');
 const cloudinary = require('cloudinary').v2;
 
 // Configure Cloudinary
@@ -293,8 +296,6 @@ exports.searchRecipes = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   const profileId = req.params.id;
-
-  // Redirect to a static HTML page with the ID in the URL
   res.redirect(`/profile.html?id=${profileId}`);
   console.log("hitting personal profiles")
 }
@@ -303,7 +304,6 @@ exports.getProfile = async (req, res) => {
 exports.userrecipies = async (req, res) => {
   try {
     const profileId = req.params.id;
-
     const recipes = await Dish.findAll({
       where: {
         userId: profileId, // Filter by creatorId
@@ -442,12 +442,10 @@ exports.favourited = async (req, res) => {
 };
 
 exports.servefavouritepage = async (req, res) => {
-
   res.sendFile(path.join(__dirname, '..', 'public', 'favourite.html'));
 }
 
 exports.servemyprofile = async (req, res) => [
-
   res.sendFile(path.join(__dirname, '..', 'public', 'myprofile.html'))
 ]
 
@@ -455,9 +453,7 @@ exports.servemyprofile = async (req, res) => [
 
 exports.getstarreddish = async (req, res) => {
   try {
-
     const userId = req.user.id
-
     // Find all starred entries for the current user
     const starredEntries = await Starred.findAll({
       where: {
@@ -567,7 +563,7 @@ exports.commentpost = async (req, res) => {
       dishId: req.body.dishId,
       comment: req.body.comment
     });
-res.json(newComment)
+    res.json(newComment)
 
   }
   catch (err) {
@@ -590,3 +586,93 @@ exports.getComments = async (req, res) => {
     res.status(500).json({ error: "Error fetching comments" });
   }
 };
+
+
+exports.allfollowers = async (req, res) => {
+  try {
+    // Get all followed IDs for the current user
+    const follows = await Follow.findAll({
+      where: { followerId: req.user.id },
+      attributes: ['followedId']
+    });
+
+    // Extract followed IDs from the result
+    const followedIds = follows.map(follow => follow.followedId);
+
+    if (followedIds.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    // Get details of followed users from Wowusers
+    const followedUsers = await Wowuser.findAll({
+      where: { id: followedIds },
+      attributes: ['id', 'name'] // Include other fields if needed
+    });
+
+    res.status(200).json(followedUsers);
+  } catch (error) {
+    console.error('Error fetching followed users:', error);
+    res.status(500).json({ message: 'Server error while fetching followed users' });
+  }
+};
+
+exports.allfollowings = async (req, res) => {
+  try {
+    // Get all followed IDs for the current user
+    const follows = await Follow.findAll({
+      where: { followedId: req.user.id },
+      attributes: ['followerId']
+    });
+
+    // Extract followed IDs from the result
+    const followedIds = follows.map(follow => follow.followerId);
+
+    if (followedIds.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    // Get details of followed users from Wowusers
+    const followedUsers = await Wowuser.findAll({
+      where: { id: followedIds },
+      attributes: ['id', 'name'] // Include other fields if needed
+    });
+
+    res.status(200).json(followedUsers);
+  } catch (error) {
+    console.error('Error fetching followed users:', error);
+    res.status(500).json({ message: 'Server error while fetching followed users' });
+  }
+};
+
+exports.servecollectionspage = async (req, res) => {
+
+  res.sendFile(path.join(__dirname, '..', 'public', 'collections.html'));
+
+}
+
+exports.postnewcollection = async (req, res) => {
+
+  let newcollection = await Collections.create({
+    userId: req.user.id,
+    collectionName: req.body.collectionname
+  })
+  console.log(newcollection)
+  res.json(newcollection)
+}
+
+exports.getcollections = async (req, res) => {
+  const usercollections = await Collections.findAll({
+    where: { userId: req.user.id }
+  });
+  console.log(usercollections)
+  res.json(usercollections)
+}
+
+exports.collectiondishadd =async (req,res)=>{
+
+  await Collectiondish.create({
+    collectionId:req.body.collectionId,
+    dishId:req.body.dishId
+  })
+  res.json({condtion:true})
+}
