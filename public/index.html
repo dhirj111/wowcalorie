@@ -149,13 +149,12 @@
   <a id="favouritesTab" href="http://localhost:1000/favourite">Favourites</a>
   <a id="collection" href="http://localhost:1000/collections">Collections</a>
   <a id="profileTab" href="http://localhost:1000/myprofile">Profile</a>
-  <a id="newdish" onclick="newdishbutton(event)">Add New Dish</a>
   </nav>
 
   <div class="header">
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search recipes..." style="flex: 1;" />
-      <button onclick="searchRecipes()">Search</button>
+      <button onclick="applyFiltersAndSearch()">Search</button>
     </div>
     <div class="filters">
       <select id="dietFilter">
@@ -173,7 +172,7 @@
         <input type="checkbox" id="glutenFreeFilter" /> Gluten-Free
       </label>
       <input type="number" id="maxTimeFilter" placeholder="Max time (minutes)" />
-      <button onclick="applyFilters()">Apply Filters</button>
+      <button onclick="applyFiltersAndSearch()">Apply Filters</button>
     </div>
   </div>
 
@@ -183,6 +182,6 @@
 
   <!-- Include Axios and our JS file -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
-  <script src="index.js"></script>
+  <script src="/index.js"></script>
 </body>
 </html>

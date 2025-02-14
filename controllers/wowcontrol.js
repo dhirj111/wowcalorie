@@ -16,6 +16,7 @@ const fs = require('fs');
 // Configure storage
 const { Op } = require('sequelize');
 const Collectiondish = require('../models/collectiondish');
+const { request } = require('http');
 const cloudinary = require('cloudinary').v2;
 
 // Configure Cloudinary
@@ -52,10 +53,10 @@ function validateInput(email, password) {
   return true; // Valid input
 }
 
-exports.baseport = (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+// exports.baseport = (req, res) => {
+//   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 
-}
+// }
 exports.baserootsignup = (req, res, next) => {
   console.log("Serving singup.html");
   res.sendFile(path.join(__dirname, '..', 'public', 'signup.html'));
@@ -654,7 +655,7 @@ exports.postnewcollection = async (req, res) => {
     userId: req.user.id,
     collectionName: req.body.collectionname
   })
-  console.log(newcollection)
+  // console.log(newcollection)
   res.json(newcollection)
 }
 
@@ -662,7 +663,7 @@ exports.getcollections = async (req, res) => {
   const usercollections = await Collections.findAll({
     where: { userId: req.user.id }
   });
-  console.log(usercollections)
+  // console.log(usercollections)
   res.json(usercollections)
 }
 
@@ -702,5 +703,73 @@ exports.dishbycolection = async (req, res) => {
   } catch (error) {
       console.error('Error fetching collection dishes:', error);
       res.status(500).json({ error: 'Failed to fetch collection dishes' });
+  }
+};
+
+// exports.querydishes = async (req, res) => {
+//   console.log("hitting querydishes   102030")
+//   try {
+//     // Extract query parameters from the URL
+//     const { query, diet, difficulty, glutenfree, maxTime } = req.query;
+//     console.log(" this here is req   .query ",req.query)
+
+//     // Build a filter object for the query
+//     let filter = {};
+
+//     // If a search term is provided, filter by dish name using a LIKE clause
+//     if (query) {
+//       filter.name = { [Op.like]: `%${query}%` };
+//     }
+//     // Filter by diet if provided
+//     if (diet) {
+//       filter.diet = diet;
+//     }
+//     // Filter by difficulty if provided
+//     if (difficulty) {
+//       filter.difficulty = difficulty;
+//     }
+//     // Optionally filter by glutenfree if provided (expecting 'true' or 'false')
+//     if (glutenfree) {
+//       filter.glutenfree = glutenfree === 'true';
+//     }
+//     // Optionally filter by maximum time if provided
+//     if (maxTime) {
+//       filter.time = { [Op.lte]: maxTime };
+//     }
+    
+//     // Restrict results to the authenticated user's dishes
+
+
+//     // Query the database using the built filter
+//     const dishes = await Dish.findAll({ where: filter });
+    
+//     return res.json({ dishes });
+//   } catch (error) {
+//     console.error("Error querying dishes:", error);
+//     return res.status(500).json({ message: "Server error" });
+//   }
+// };
+
+exports.servePage = (req, res) => {
+  console.log("serve page url is ==" , request.path ,req.poa)
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+};
+
+exports.querydishes = async (req, res) => {
+  try {
+    const { query, diet, difficulty, glutenfree, maxTime } = req.query;
+    
+    let filter = {};
+    if (query) filter.name = { [Op.like]: `%${query}%` };
+    if (diet) filter.diet = diet;
+    if (difficulty) filter.difficulty = difficulty;
+    if (glutenfree) filter.glutenfree = glutenfree === 'true';
+    if (maxTime) filter.time = { [Op.lte]: maxTime };
+    
+    const dishes = await Dish.findAll({ where: filter });
+    return res.json({ dishes });
+  } catch (error) {
+    console.error("Error querying dishes:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };

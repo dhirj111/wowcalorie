@@ -114,15 +114,134 @@ body {
 .logout-btn:hover {
     background: #2980b9;
 }
+
+.navbar {
+    background-color: #333;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.navbar a:hover {
+    background-color: #444;
+}
+
+/* New styles for follow list */
+#followlist {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.follow-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
+}
+
+.follow-item:last-child {
+    border-bottom: none;
+}
+
+.follow-item:hover {
+    background-color: #f8f9fa;
+}
+
+.follow-avatar {
+    width: 50px;
+    height: 50px;
+    background-color: #3498db;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.follow-info {
+    flex-grow: 1;
+}
+
+.follow-name {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.follow-stats {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.unfollow-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.unfollow-btn:hover {
+    background-color: #c0392b;
+}
+.remove-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .remove-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* For dark theme (following.html) */
+        body.dark-theme .remove-btn {
+            background-color: #ff4444;
+        }
+
+        body.dark-theme .remove-btn:hover {
+            background-color: #cc0000;
+        }
 </style>
 </head>
 <body>
+    <nav class="navbar">
+        <a id="defaultFeed" href="http://localhost:1000/">Default Feed</a>
+        <a id="followingTab" href="http://localhost:1000/following">Following</a>
+        <a id="favouritesTab" href="http://localhost:1000/favourite">Favourites</a>
+        <a id="collection" href="http://localhost:1000/collections">Collections</a>
+        <a id="profileTab" href="http://localhost:1000/myprofile">Profile</a>
+    </nav>
     <header class="header">
         <h1 id="profile-name"></h1>
         <button id="logout" class="logout-btn">Log out</button>
     </header>
     <div id="followlist">
-
+        <!-- Follow list items will be added here by JavaScript -->
     </div>
     <main class="container">
         <div id="recipeContainer" class="recipe-grid"></div>

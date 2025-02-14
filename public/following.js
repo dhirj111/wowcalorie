@@ -24,6 +24,7 @@ function displayRecipes(recipes) {
             <div class="profile-icon">👤</div>
             <h3>${recipe.name}</h3>
           </div>
+          <p>Creator: ${recipe.creatorName}</p>
           <p>Diet: ${recipe.diet}</p>
           <p>Difficulty: ${recipe.difficulty}</p>
           <p>Time: ${recipe.time} minutes</p>
@@ -71,15 +72,29 @@ axios
     }
   })
   .then((result) => {
-
     console.log(result);
-    let fwgcontainer = document.getElementById("followlist")
+    const followlist = document.getElementById("followlist");
+    followlist.innerHTML = ''; // Clear existing content
+    
     for (let i = 0; i < result.data.length; i++) {
-      let node = document.createElement('li')
-      node.innerHTML = `${i + 1} |  ${result.data[i].name} id =${result.data[i].id}`
-      fwgcontainer.appendChild(node)
+        const followItem = document.createElement('div');
+        followItem.className = 'follow-item';
+        
+        // Get first letter of name for avatar
+        const firstLetter = result.data[i].name.charAt(0).toUpperCase();
+        
+        followItem.innerHTML = `
+            <div class="follow-avatar">${firstLetter}</div>
+            <div class="follow-info">
+                <div class="follow-name">${result.data[i].name}</div>
+                <div class="follow-stats">ID: ${result.data[i].id}</div>
+            </div>
+            <button class="unfollow-btn" data-id="${result.data[i].id}">Unfollow</button>
+        `;
+        
+        followlist.appendChild(followItem);
     }
-  })
+})
   .catch((err) => {
     alert("you are not logged in currently ,please login")
     console.error("Error fetching recipes:", err);

@@ -35,7 +35,7 @@ router.get('/newdish', userController.newdishpage)
 
 router.post('/dishpost', auth, upload.single('image'), userController.dishpostdb);
 
-router.get('/', userController.baseport)
+  // router.get('/', userController.baseport)
 
 router.get('/getrecipes', userController.getAllRecipes);
 
@@ -90,5 +90,11 @@ router.get('/getcollections' ,auth ,userController.getcollections)
 router.post('/collectiondishadd',auth ,userController.collectiondishadd)
 
 router.get('/getcollectiondishes', auth, userController.dishbycolection);
+
+// router.get('/filters',  userController.querydishes);
+
+
+router.get(['/', '/filters'], userController.servePage);
+router.get('/api/filters', userController.querydishes);
 
 module.exports = router

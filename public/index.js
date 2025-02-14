@@ -1,4 +1,4 @@
-// Navigate to the "new dish" page
+// Navigate to the new dish page
 const newdishbutton = (event) => {
   event.preventDefault();
   window.location.href = "http://localhost:1000/newdish";
@@ -14,12 +14,18 @@ const newdishbutton = (event) => {
 
 let currentRecipes = [];
 
-// Function to load recipes with optional filters
-function loadRecipes(filters = {}) {
-  const queryParams = new URLSearchParams(filters).toString();
-  axios.get(`http://localhost:1000/getrecipes?${queryParams}`)
+// Updated index.js (client-side code)
+function loadRecipes(query = {}) {
+  const queryParams = new URLSearchParams(query).toString();
+  
+  // Update the browser's URL but keep the /filters base path
+  history.replaceState(null, '', `/filters/?${queryParams}`);
+
+  // Make API call to the separate API endpoint
+  axios.get(`/api/filters/?${queryParams}`)
     .then(response => {
-      currentRecipes = response.data;
+      console.log("API Response:", response);
+      currentRecipes = response.data.dishes || [];
       displayRecipes(currentRecipes);
     })
     .catch(error => {
@@ -27,35 +33,37 @@ function loadRecipes(filters = {}) {
     });
 }
 
-// Function to search recipes based on search input
-function searchRecipes() {
-  const query = document.getElementById('searchInput').value;
-  if (!query) {
-    loadRecipes();
-    return;
-  }
-  axios.get(`http://localhost:1000/searchrecipes?query=${query}`)
+// Function to combine search term and filter customizations into one query object
+// and load recipes accordingly.
+function applyFiltersAndSearch() {
+  const searchTerm = document.getElementById('searchInput')?.value || '';
+  const diet = document.getElementById('dietFilter')?.value || '';
+  const difficulty = document.getElementById('difficultyFilter')?.value || '';
+  const glutenfree = document.getElementById('glutenFreeFilter')?.checked || false;
+  const maxTime = document.getElementById('maxTimeFilter')?.value || '';
+
+  let queryObj = {};
+  if (searchTerm) queryObj.query = searchTerm;
+  if (diet) queryObj.diet = diet;
+  if (difficulty) queryObj.difficulty = difficulty;
+  if (glutenfree) queryObj.glutenfree = glutenfree;
+  if (maxTime) queryObj.maxTime = maxTime;
+
+  const queryParams = new URLSearchParams(queryObj).toString();
+  
+  // Update URL with filters path
+  history.replaceState(null, '', `/filters/?${queryParams}`);
+
+  // Make API call to the separate endpoint
+  axios.get(`/api/filters/?${queryParams}`)
     .then(response => {
-      currentRecipes = response.data;
+      currentRecipes = response.data.dishes || [];
       displayRecipes(currentRecipes);
     })
     .catch(error => {
-      console.error('Error searching recipes:', error);
+      console.error('Error loading recipes:', error);
     });
-}
-
-// Function to apply filters 
-function applyFilters() {
-  const filters = {
-    diet: document.getElementById('dietFilter').value,
-    difficulty: document.getElementById('difficultyFilter').value,
-    glutenfree: document.getElementById('glutenFreeFilter').checked,
-    maxTime: document.getElementById('maxTimeFilter').value
-  };
-  loadRecipes(filters);
-}
-
-// Function to load user collections
+}// Function to load user collections
 function loadUserCollections(selectElement) {
   axios.get("http://localhost:1000/getcollections", {
     headers: {
@@ -64,7 +72,7 @@ function loadUserCollections(selectElement) {
   })
     .then(response => {
       selectElement.innerHTML = '<option value="">Select Collection</option>';
-      console.log(response.data)
+      console.log(response.data);
       response.data.forEach(collection => {
         selectElement.innerHTML += `
           <option value="${collection.id}">${collection.collectionName}</option>
@@ -76,13 +84,13 @@ function loadUserCollections(selectElement) {
     });
 }
 
-// Function to add dish to collection
+// Function to add a dish to a collection
 function addToCollection(collectionId, dishId) {
   if (!collectionId) {
     alert("Please select a collection");
     return;
   }
-  console.log(collectionId ,"         ",dishId)
+  console.log(collectionId, dishId);
   axios.post("http://localhost:1000/collectiondishadd", {
     collectionId,
     dishId
@@ -122,6 +130,7 @@ function loadComments(dishId, container) {
 
 // Function to display recipes in the recipe container
 function displayRecipes(recipes) {
+  console.log("displayreciepes is ------",recipes)
   const container = document.getElementById('recipeContainer');
   container.innerHTML = '';
 
@@ -250,7 +259,31 @@ function favouriteDish(dishId) {
     .catch(error => console.error("Error adding to favourites:", error));
 }
 
-// Load initial recipes when the page loads
+// Load initial recipes when the page loads.
+// This will read any query parameters from the URL to pre-populate the search and filters.
 document.addEventListener('DOMContentLoaded', () => {
-  loadRecipes();
+  // Extract query parameters from the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const query = urlParams.get('query') || '';
+  const diet = urlParams.get('diet') || '';
+  const difficulty = urlParams.get('difficulty') || '';
+  const glutenfree = urlParams.get('glutenfree') === 'true'; // Convert string to boolean
+  const maxTime = urlParams.get('maxTime') || '';
+
+  // Populate the input fields with the values from the URL, if present.
+  if (document.getElementById('searchInput')) document.getElementById('searchInput').value = query;
+  if (document.getElementById('dietFilter')) document.getElementById('dietFilter').value = diet;
+  if (document.getElementById('difficultyFilter')) document.getElementById('difficultyFilter').value = difficulty;
+  if (document.getElementById('glutenFreeFilter')) document.getElementById('glutenFreeFilter').checked = glutenfree;
+  if (document.getElementById('maxTimeFilter')) document.getElementById('maxTimeFilter').value = maxTime;
+
+  // Build the query object for loading recipes
+  let queryObj = {};
+  if (query) queryObj.query = query;
+  if (diet) queryObj.diet = diet;
+  if (difficulty) queryObj.difficulty = difficulty;
+  if (glutenfree) queryObj.glutenfree = glutenfree;
+  if (maxTime) queryObj.maxTime = maxTime;
+  console.log("queryBJ is   jk O", queryObj)
+  loadRecipes(queryObj);
 });
